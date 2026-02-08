@@ -91,15 +91,17 @@ flowchart LR
     C --> D[Trained ML Model (.pkl)]
     D --> E[Prediction System]
     E --> F[Dashboard Visualizations]
+```
+
 
 
 ## 📊 Data Visualizations
 
 ### Performance Distribution
-![Performance Distribution](dashboard/images/performance_distribution.png)
+![Performance Distribution](Visualizations/images/performance_distribution.png)
 
 ### Attendance vs Internal Score
-![Attendance vs Internal Score](dashboard/images/attendance_vs_score.png)
+![Attendance vs Internal Score](Visualizations/images/attendance_vs_score.png)
 
 ### Feature Correlation Heatmap
-![Feature Correlation](dashboard/images/feature_heatmap.png)
+![Feature Correlation](Visualizations/images/feature_heatmap.png)
