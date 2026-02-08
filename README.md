@@ -33,18 +33,21 @@ This system consists of:
 
 ---
 
-## 📂 Project Folder Structure
+
+```markdown
+## 📁 Project Folder Structure
+
 
 project/
 │
 ├── data_generator/ # Scripts to generate synthetic student data
-├── database/ # Scripts to store and manage SQL data
-├── scripts/ # Utility and testing scripts
-├── models/ # Saved trained ML models
-├── dashboard/ # Frontend dashboard project
+├── database/ # Scripts to create and manage SQLite DB
+├── scripts/ # Utility & testing scripts
+├── models/ # Saved trained ML models (.pkl)
+├── dashboard/ # React frontend dashboard
 └── README.md
 
-**Data Pipeline**
+## Data Pipeline
 
 Student data is generated using a Python script
 
@@ -56,7 +59,7 @@ The trained model is saved for future predictions
 
 New prediction inputs can be added to the database for future retraining
 
- **Model Lifecycle**
+ ## Model Lifecycle
 
 Initial model is trained on historical academic data
 
@@ -66,7 +69,7 @@ Model can be periodically retrained with updated data
 
 Versioned models can be maintained for comparison
 
- **Dashboard Features**
+ ## Dashboard Features
 
 Overview statistics (total students, average scores, performance distribution)
 
@@ -87,9 +90,9 @@ flowchart LR
     B --> C[Model Training Script]
     C --> D[Trained ML Model (.pkl)]
     D --> E[Prediction System]
-    B --> F[Dashboard Visualizations]
-    E --> F
-    
+    E --> F[Dashboard Visualizations]
+
+
 ## 📊 Data Visualizations
 
 ### Performance Distribution
@@ -99,4 +102,4 @@ flowchart LR
 ![Attendance vs Internal Score](dashboard/images/attendance_vs_score.png)
 
 ### Feature Correlation Heatmap
-![Correlation Heatmap](dashboard/images/correlation_heatmap.png)
+![Feature Correlation](dashboard/images/feature_heatmap.png)
