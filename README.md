@@ -88,10 +88,11 @@ Model information and performance metrics display
 flowchart LR
     A[Student Data Generation] --> B[SQLite Database]
     B --> C[Model Training Script]
-    C --> D[Trained ML Model (.pkl)]
+    C --> D[Trained ML Model - PKL File]
     D --> E[Prediction System]
     E --> F[Dashboard Visualizations]
 ```
+
 
 
 
@@ -104,4 +105,4 @@ flowchart LR
 ![Attendance vs Internal Score](Visualizations/images/attendance_vs_score.png)
 
 ### Feature Correlation Heatmap
-![Feature Correlation](Visualizations/images/feature_heatmap.png)
+![Feature Correlation](Visualizations/images/correlation_heatmap.png)
