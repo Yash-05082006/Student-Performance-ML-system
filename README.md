@@ -91,6 +91,7 @@ flowchart LR
     C --> D[Trained ML Model - PKL File]
     D --> E[Prediction System]
     E --> F[Dashboard Visualizations]
+    
 ```
 
 
@@ -98,11 +99,46 @@ flowchart LR
 
 ## 📊 Data Visualizations
 
+**These visualizations are generated from the student dataset and help in understanding performance patterns and relationships between different academic factors.**
+
 ### Performance Distribution
 ![Performance Distribution](Visualizations/images/performance_distribution.png)
+
+This chart shows how students are distributed across the three performance categories:
+
+High Performance
+
+Medium Performance
+
+Low Performance
+
+It helps quickly understand the overall academic standing of the student population.
 
 ### Attendance vs Internal Score
 ![Attendance vs Internal Score](Visualizations/images/attendance_vs_score.png)
 
+This scatter plot visualizes the relationship between attendance percentage and internal test scores.
+
+Each point represents a student
+
+Helps identify trends between classroom presence and academic performance
+
+Useful for spotting students at academic risk
+
 ### Feature Correlation Heatmap
-![Feature Correlation](Visualizations/images/correlation_heatmap.png)
+![Feature Correlation Heatmap](Visualizations/images/correlation_heatmap_copy.png)
+
+This heatmap shows the correlation between all major academic features used in the model:
+
+Attendance
+
+Internal Score
+
+Assignment Score
+
+Backlogs
+
+Engagement
+
+Darker shades indicate stronger relationships (positive or negative).
+This helps understand how different academic factors influence each other.
