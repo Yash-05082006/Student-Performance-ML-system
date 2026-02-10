@@ -31,10 +31,16 @@ plt.savefig("dashboard/images/attendance_vs_score.png")
 plt.close()
 
 # 3. Feature Correlation Heatmap
-plt.figure(figsize=(6,4))
+plt.figure(figsize=(8,6))
 sns.heatmap(df.corr(numeric_only=True), annot=True, cmap="coolwarm")
 plt.title("Feature Correlation Heatmap")
+
+plt.xticks(rotation=45, ha="right")
+plt.yticks(rotation=0)
+
+plt.tight_layout()
 plt.savefig("dashboard/images/correlation_heatmap.png")
 plt.close()
 
 print("README visualizations generated successfully!")
+
