@@ -1,49 +1,40 @@
 ```mermaid
 flowchart TD
 
-  A[Start] --> B[Generate Synthetic Student Data\n(Python Script)]
+A[Start] --> B[Generate Synthetic Data\nPython Script]
+B --> C[Save CSV student_data]
+C --> D[Store Data SQLite students_db]
+D --> E[Load Data for ML]
 
-  B --> C[Save as CSV\nstudent_data.csv]
+E --> F[Preprocessing Module]
+F --> F1[Encode Labels High Medium Low to 0 1 2]
+F --> F2[Stratified Train Test Split]
 
-  C --> D[Store Data in SQLite Database\nstudents.db]
+F1 --> G
+F2 --> G
 
-  D --> E[Load Data from Database]
-  
-  E --> F[Data Preprocessing Module]
+G[Train ML Models]
 
-  F --> F1[Encode Labels\nHigh/Medium/Low → 0/1/2]
-  F --> F2[Stratified Train-Test Split]
+G --> H1[Logistic Regression]
+G --> H2[Decision Tree]
+G --> H3[Random Forest]
+G --> H4[KNN]
+G --> H5[SVM]
+G --> H6[Gradient Boosting]
 
-  F1 --> G
-  F2 --> G
+H1 --> I[Evaluate Macro F1 Cross Validation]
+H2 --> I
+H3 --> I
+H4 --> I
+H5 --> I
+H6 --> I
 
-  G[Train Multiple ML Models]
+I --> J[Select Best Model CV F1]
 
-  G --> H1[Logistic Regression\nLinear Baseline]
-  G --> H2[Decision Tree\nRule-Based Model]
-  G --> H3[Random Forest\nEnsemble Model]
-  G --> H4[KNN\nDistance-Based Model]
-  G --> H5[SVM\nMargin-Based Classifier]
-  G --> H6[Gradient Boosting\nBoosting Ensemble]
-
-  H1 --> I[Evaluate Using\nMacro F1 Score + Cross-Validation]
-  H2 --> I
-  H3 --> I
-  H4 --> I
-  H5 --> I
-  H6 --> I
-
-  I --> J[Select Best Model\nBased on CV F1 Score]
-
-  J --> K[Save Best Model\nstudent_model_v1.pkl\n(Local Only)]
-
-  K --> L[New Student Input\n(Dashboard / Script)]
-
-  L --> M[Load Saved Model]
-
-  M --> N[Predict Student Performance]
-
-  N --> O[Store Prediction in Database]
-
-  O --> P[End\nSystem Ready for Next Student]
-  ```
+J --> K[Save Model student_model_v1]
+K --> L[New Student Input Dashboard]
+L --> M[Load Saved Model]
+M --> N[Predict Performance]
+N --> O[Store Prediction Database]
+O --> P[End]
+```
