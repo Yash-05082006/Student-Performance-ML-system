@@ -81,11 +81,11 @@ O --> P[End]
 
 project/
 │
-├── data_generator/ # Scripts to generate synthetic student data
-├── database/ # Scripts to create and manage SQLite DB
-├── scripts/ # Utility & testing scripts
-├── models/ # Saved trained ML models (.pkl)
-├── dashboard/ # React frontend dashboard
+├── data_generator/
+├── database/
+├── scripts/
+├── models/
+├── dashboard/
 └── README.md
 
 ---
