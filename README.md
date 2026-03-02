@@ -1,21 +1,19 @@
 # 🎓 Student Academic Performance Prediction System
 
 ## 📌 Problem Statement
-Universities often struggle to identify students who may be at academic risk early enough for effective intervention. Academic performance depends on multiple factors such as attendance, internal assessments, assignments, and engagement. Manual tracking of these patterns is difficult and time-consuming.
+Universities often struggle to identify students who may be at academic risk early enough for effective intervention. Academic performance depends on multiple factors such as attendance, internal assessments, assignments, and engagement.
 
 ## 🎯 Project Goal
-This project aims to build a **machine learning–powered system** that predicts a student's final academic performance (High / Medium / Low) using key academic indicators. The system also provides a dashboard for analyzing trends and making real-time predictions.
+Build a **machine learning system** that predicts student performance (High / Medium / Low) and provides a dashboard for analytics and real-time prediction.
 
 ---
 
 ## 🧠 System Overview
 
-This system consists of:
-
-1. **Data Generation & Storage** – Student academic records stored in an SQL database  
-2. **Model Training Pipeline** – Traditional ML models trained on academic features  
-3. **Prediction System** – Uses trained model to predict student performance  
-4. **Dashboard/UI** – Visualizes data trends and allows interactive predictions  
+1. Data generation and storage in SQLite  
+2. ML training pipeline with multiple models  
+3. Prediction system using best model  
+4. Dashboard for visualization and input  
 
 ---
 
@@ -23,61 +21,60 @@ This system consists of:
 
 | Component | Technology |
 |----------|------------|
-| Programming Language | Python |
-| Database | SQLite |
-| ML Libraries | Scikit-learn, Pandas, NumPy |
-| Model Serialization | Joblib |
-| Dashboard | React + TypeScript (Vite) |
-| Charts | Recharts |
-| Version Control | Git & GitHub |
+Python | Core language  
+Database | SQLite  
+ML | Scikit-learn, Pandas, NumPy  
+Serialization | Joblib  
+Dashboard | React + TypeScript  
+Charts | Recharts  
+Version Control | Git & GitHub  
 
 ---
 
-
-```markdown
-
-## Pipeline
+# 🔄 ML Pipeline
 
 ```mermaid
 flowchart TD
 
-A[Start] --> B[Generate Synthetic Data\nPython Script]
-B --> C[Save CSV student_data]
-C --> D[Store Data SQLite students_db]
-D --> E[Load Data for ML]
+A[Start] --> B["Generate Synthetic Data<br/>Python Script"]
+B --> C["Save CSV<br/>student data"]
+C --> D["Store Data<br/>SQLite database"]
+D --> E["Load Data for ML"]
 
-E --> F[Preprocessing Module]
-F --> F1[Encode Labels High Medium Low to 0 1 2]
-F --> F2[Stratified Train Test Split]
+E --> F["Preprocessing Module"]
+F --> F1["Encode Labels<br/>High Medium Low to 0 1 2"]
+F --> F2["Stratified Train Test Split"]
 
 F1 --> G
 F2 --> G
 
-G[Train ML Models]
+G["Train ML Models"]
 
-G --> H1[Logistic Regression]
-G --> H2[Decision Tree]
-G --> H3[Random Forest]
-G --> H4[KNN]
-G --> H5[SVM]
-G --> H6[Gradient Boosting]
+G --> H1["Logistic Regression"]
+G --> H2["Decision Tree"]
+G --> H3["Random Forest"]
+G --> H4["KNN"]
+G --> H5["SVM"]
+G --> H6["Gradient Boosting"]
 
-H1 --> I[Evaluate Macro F1 Cross Validation]
+H1 --> I["Evaluate using<br/>Macro F1 Cross Validation"]
 H2 --> I
 H3 --> I
 H4 --> I
 H5 --> I
 H6 --> I
 
-I --> J[Select Best Model CV F1]
-
-J --> K[Save Model student_model_v1]
-K --> L[New Student Input Dashboard]
-L --> M[Load Saved Model]
-M --> N[Predict Performance]
-N --> O[Store Prediction Database]
+I --> J["Select Best Model<br/>based on CV F1"]
+J --> K["Save Model<br/>student model v1"]
+K --> L["New Student Input<br/>Dashboard"]
+L --> M["Load Saved Model"]
+M --> N["Predict Performance"]
+N --> O["Store Prediction<br/>Database"]
 O --> P[End]
 ```
+
+---
+
 
 ## 📁 Project Folder Structure
 
@@ -90,6 +87,8 @@ project/
 ├── models/ # Saved trained ML models (.pkl)
 ├── dashboard/ # React frontend dashboard
 └── README.md
+
+---
 
 ## Data Pipeline
 
