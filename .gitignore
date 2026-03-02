@@ -1,0 +1,14 @@
+# Ignore database files
+*.db
+
+# Ignore CSV data files (generated data)
+*.csv
+
+# Ignore saved ML models
+saved_models/*.pkl
+
+# Ignore virtual environment
+.venv/
+
+# Ignore Python cache
+__pycache__/
