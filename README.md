@@ -28,6 +28,119 @@ Serialization | Joblib
 Dashboard | React + TypeScript  
 Charts | Recharts  
 Version Control | Git & GitHub  
+Backend API | FastAPI + Uvicorn
+
+---
+
+## 🚀 Backend API Setup
+
+The system includes a **FastAPI backend** that serves the trained Machine Learning model and enables real-time student performance predictions for the dashboard.
+
+---
+
+## 📦 Starting the Backend
+
+| Step | Command |
+|-----|-----|
+| Navigate to backend folder | `cd backend` |
+| Install dependencies | `pip install -r requirements.txt` |
+| Start FastAPI server | `uvicorn main:app --reload --host 0.0.0.0 --port 8000` |
+
+### Alternative Command (Run from project root)
+
+| Command |
+|------|
+| `python -m uvicorn backend.main:app --reload --host 0.0.0.0 --port 8000` |
+
+---
+
+## 🌐 API Endpoints
+
+| Method | Endpoint | Description |
+|------|------|------|
+| GET | `/health` | Checks API health and verifies if the ML model is loaded |
+| POST | `/predict` | Generates student performance prediction using the trained ML model |
+
+---
+
+## 📥 Prediction Request Format
+
+### Endpoint
+`POST /predict`
+
+### Request Parameters
+
+| Parameter | Type | Range | Description |
+|------|------|------|------|
+| attendance | integer | 0 – 100 | Student attendance percentage |
+| testScore | integer | 0 – 100 | Internal test score |
+| assignmentScore | integer | 0 – 100 | Assignment score |
+| backlogs | integer | 0 – 10 | Number of pending backlogs |
+| engagement | integer | 0 – 100 | Student engagement score |
+
+### Example Request
+
+```json
+{
+  "attendance": 85,
+  "testScore": 78,
+  "assignmentScore": 80,
+  "backlogs": 0,
+  "engagement": 90
+}
+```
+
+---
+
+## 📤 Prediction Response Format
+
+### Response Fields
+
+| Field | Type | Description |
+|------|------|------|
+| level | string | Predicted performance category (High / Medium / Low) |
+| confidence | float | Model confidence score in percentage |
+| recommendations | array | List of improvement recommendations for the student |
+| factors | array | Contributing factors influencing the prediction |
+
+### Example Response
+
+```json
+{
+  "level": "High",
+  "confidence": 95.82,
+  "recommendations": [...],
+  "factors": [...]
+}
+```
+
+---
+
+## 🧠 API Architecture Overview
+
+| Component | Description |
+|------|------|
+| FastAPI | Backend framework serving the ML model |
+| Random Forest Classifier | Trained machine learning model used for predictions |
+| Label Encoder | Converts encoded labels into readable performance categories |
+| React Dashboard | Frontend interface that interacts with the API |
+
+---
+
+## 🩺 Health Check Endpoint
+
+| Endpoint | Purpose |
+|------|------|
+| `/health` | Confirms backend status and verifies that the ML model is loaded |
+
+Example Response:
+
+```json
+{
+  "status": "healthy",
+  "model_loaded": true
+}
+```
 
 ---
 
@@ -78,15 +191,55 @@ O --> P[End]
 
 ## 📁 Project Folder Structure
 
-
-project/
+```
+Hackathon_3/
 │
-├── data_generator/
-├── database/
-├── scripts/
-├── models/
-├── dashboard/
-└── README.md
+├── backend/                 # FastAPI backend serving the ML model
+│
+├── Dashboard_Hackathon3/    # React dashboard for analytics and predictions
+│
+├── data_generator/          # Synthetic student data generation scripts
+│
+├── database/                # SQLite database utilities and data storage
+│
+├── model_training/          # ML training pipeline and model evaluation
+│
+├── preprocessing/           # Data preprocessing and feature preparation
+│
+├── saved_models/            # Trained ML models stored as .pkl files
+│
+├── scripts/                 # Utility scripts for prediction and database operations
+│
+├── Visualizations/          # Generated charts, plots, and analytics visuals
+│
+├── students.db              # SQLite database containing student records
+│
+├── student_data.csv         # Generated synthetic dataset
+│
+├── pipeline.md              # Documentation for ML pipeline
+│
+└── README.md                # Project documentation
+```
+
+---
+
+## 📂 Folder Description
+
+| Folder | Purpose |
+|------|------|
+| `backend/` | FastAPI backend used to serve the trained ML model and provide prediction APIs |
+| `Dashboard_Hackathon3/` | React + TypeScript dashboard used for visualization, analytics, and prediction interface |
+| `data_generator/` | Scripts used to generate synthetic student academic data |
+| `database/` | Utilities for storing and retrieving data from the SQLite database |
+| `model_training/` | Machine learning training pipeline including model selection and evaluation |
+| `preprocessing/` | Data preprocessing module handling feature preparation and dataset splitting |
+| `saved_models/` | Serialized trained ML models saved using Joblib |
+| `scripts/` | Utility scripts for predictions, database checks, and automation |
+| `Visualizations/` | Generated plots and visual analytics outputs |
+| `students.db` | SQLite database containing student performance records |
+| `student_data.csv` | Raw generated dataset used for training |
+| `pipeline.md` | Documentation explaining the ML workflow pipeline |
+| `README.md` | Main documentation file for the repository |
 
 ---
 
