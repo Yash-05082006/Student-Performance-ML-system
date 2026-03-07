@@ -1,25 +1,13 @@
-import { Users, Percent, BookOpen, TrendingUp, AlertTriangle, Activity } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Users, Percent, BookOpen, TrendingUp, AlertTriangle, Activity, Loader2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import StatCard from "@/components/StatCard";
-import { overviewStats, quickStats, students } from "@/data/mockData";
+import { getAnalytics, getStudents, type AnalyticsResponse, ApiError } from "@/services/api";
+import type { Student } from "@/data/mockData";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   ScatterChart, Scatter, PieChart, Pie, Cell, Legend,
 } from "recharts";
-
-const perfDistData = [
-  { name: "High", value: overviewStats.performanceDistribution.high, fill: "hsl(160, 84%, 39%)" },
-  { name: "Medium", value: overviewStats.performanceDistribution.medium, fill: "hsl(38, 92%, 50%)" },
-  { name: "Low", value: overviewStats.performanceDistribution.low, fill: "hsl(0, 84%, 60%)" },
-];
-
-const testScoreHistogram = [
-  { range: "0-20", count: students.filter((s) => s.testScore <= 20).length },
-  { range: "21-40", count: students.filter((s) => s.testScore > 20 && s.testScore <= 40).length },
-  { range: "41-60", count: students.filter((s) => s.testScore > 40 && s.testScore <= 60).length },
-  { range: "61-80", count: students.filter((s) => s.testScore > 60 && s.testScore <= 80).length },
-  { range: "81-100", count: students.filter((s) => s.testScore > 80).length },
-];
 
 const perfColors: Record<string, string> = {
   High: "hsl(160,84%,39%)",
@@ -28,6 +16,73 @@ const perfColors: Record<string, string> = {
 };
 
 export default function Overview() {
+  const [analytics, setAnalytics] = useState<AnalyticsResponse | null>(null);
+  const [students, setStudents] = useState<Student[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        setLoading(true);
+        const [analyticsData, studentsData] = await Promise.all([
+          getAnalytics(),
+          getStudents(),
+        ]);
+        setAnalytics(analyticsData);
+        setStudents(studentsData);
+      } catch (err) {
+        let errorMessage = "Failed to load dashboard data";
+        if (err instanceof ApiError) {
+          errorMessage = err.message;
+        } else if (err instanceof Error) {
+          errorMessage = err.message;
+        }
+        setError(errorMessage);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchData();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <span className="ml-2 text-muted-foreground">Loading dashboard data...</span>
+      </div>
+    );
+  }
+
+  if (error || !analytics) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <AlertTriangle className="h-8 w-8 text-destructive mx-auto mb-2" />
+          <p className="text-destructive">{error || "Failed to load data"}</p>
+        </div>
+      </div>
+    );
+  }
+
+  const perfDistData = [
+    { name: "High", value: analytics.performance_distribution.high, fill: "hsl(160, 84%, 39%)" },
+    { name: "Medium", value: analytics.performance_distribution.medium, fill: "hsl(38, 92%, 50%)" },
+    { name: "Low", value: analytics.performance_distribution.low, fill: "hsl(0, 84%, 60%)" },
+  ];
+
+  const testScoreHistogram = [
+    { range: "0-20", count: students.filter((s) => s.testScore <= 20).length },
+    { range: "21-40", count: students.filter((s) => s.testScore > 20 && s.testScore <= 40).length },
+    { range: "41-60", count: students.filter((s) => s.testScore > 40 && s.testScore <= 60).length },
+    { range: "61-80", count: students.filter((s) => s.testScore > 60 && s.testScore <= 80).length },
+    { range: "81-100", count: students.filter((s) => s.testScore > 80).length },
+  ];
+
+  const lowAttendance = students.filter((s) => s.attendance < 60).length;
+  const highBacklogs = students.filter((s) => s.backlogs >= 3).length;
   return (
     <div className="space-y-8">
       <div>
@@ -37,15 +92,15 @@ export default function Overview() {
 
       {/* Summary Cards */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard title="Total Students" value={overviewStats.totalStudents} icon={Users} subtitle="Analyzed this semester" />
-        <StatCard title="Avg Attendance" value={`${overviewStats.avgAttendance}%`} icon={Percent} variant="success" subtitle="Across all students" />
-        <StatCard title="Avg Test Score" value={overviewStats.avgTestScore} icon={BookOpen} variant="warning" subtitle="Internal examinations" />
+        <StatCard title="Total Students" value={analytics.total_students} icon={Users} subtitle="Analyzed this semester" />
+        <StatCard title="Avg Attendance" value={`${analytics.avg_attendance}%`} icon={Percent} variant="success" subtitle="Across all students" />
+        <StatCard title="Avg Test Score" value={analytics.avg_test_score} icon={BookOpen} variant="warning" subtitle="Internal examinations" />
         <StatCard
           title="High Performers"
-          value={overviewStats.performanceDistribution.high}
+          value={analytics.performance_distribution.high}
           icon={TrendingUp}
           variant="success"
-          subtitle={`${Math.round((overviewStats.performanceDistribution.high / overviewStats.totalStudents) * 100)}% of total`}
+          subtitle={`${Math.round((analytics.performance_distribution.high / analytics.total_students) * 100)}% of total`}
         />
       </div>
 
@@ -78,7 +133,7 @@ export default function Overview() {
               <Tooltip
                 content={({ active, payload }) => {
                   if (!active || !payload || !payload.length) return null;
-                  const p = payload[0].payload as (typeof students)[number];
+                  const p = payload[0].payload as Student;
                   return (
                     <div className="rounded-md border bg-background px-3 py-2 text-xs shadow-sm">
                       <div className="font-medium mb-1">Student</div>
@@ -90,8 +145,8 @@ export default function Overview() {
                 }}
               />
               <Scatter data={students}>
-                {students.map((s) => (
-                  <Cell key={s.id} fill={perfColors[s.performance]} />
+                {students.map((s, i) => (
+                  <Cell key={i} fill={perfColors[s.performance]} />
                 ))}
               </Scatter>
             </ScatterChart>
@@ -169,7 +224,7 @@ export default function Overview() {
               </div>
               <div>
                 <p className="text-sm font-medium">Low Attendance Students</p>
-                <p className="text-2xl font-bold">{quickStats.lowAttendance}</p>
+                <p className="text-2xl font-bold">{lowAttendance}</p>
                 <p className="text-xs text-muted-foreground">Below 60% attendance</p>
               </div>
             </div>
@@ -179,7 +234,7 @@ export default function Overview() {
               </div>
               <div>
                 <p className="text-sm font-medium">High Backlog Count</p>
-                <p className="text-2xl font-bold">{quickStats.highBacklogs}</p>
+                <p className="text-2xl font-bold">{highBacklogs}</p>
                 <p className="text-xs text-muted-foreground">3 or more backlogs</p>
               </div>
             </div>
@@ -189,7 +244,7 @@ export default function Overview() {
               </div>
               <div>
                 <p className="text-sm font-medium">Average Engagement</p>
-                <p className="text-2xl font-bold">{quickStats.avgEngagement}%</p>
+                <p className="text-2xl font-bold">{analytics.avg_engagement}%</p>
                 <p className="text-xs text-muted-foreground">Composite engagement metric</p>
               </div>
             </div>

@@ -4,15 +4,19 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { mockPredict, type PredictionResult } from "@/data/mockData";
+import { predictStudent, ApiError, type PredictionResponse } from "@/services/api";
 import PerformanceBadge from "@/components/PerformanceBadge";
-import { BrainCircuit, RotateCcw, Loader2, ArrowUp, ArrowDown, Minus, CheckCircle2 } from "lucide-react";
+import { BrainCircuit, RotateCcw, Loader2, ArrowUp, ArrowDown, Minus, CheckCircle2, AlertCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { toast } from "@/hooks/use-toast";
+import {
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell
+} from "recharts";
 
 interface PredictionLog {
   id: number;
   input: { attendance: number; testScore: number; assignmentScore: number; backlogs: number; engagement: number };
-  result: PredictionResult;
+  result: PredictionResponse;
 }
 
 export default function Prediction() {
@@ -22,21 +26,41 @@ export default function Prediction() {
   const [backlogs, setBacklogs] = useState("0");
   const [engagement, setEngagement] = useState(60);
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<PredictionResult | null>(null);
+  const [result, setResult] = useState<PredictionResponse | null>(null);
   const [history, setHistory] = useState<PredictionLog[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
   const isValid = attendance >= 0 && attendance <= 100 && testScore >= 0 && testScore <= 100 && assignmentScore >= 0 && assignmentScore <= 100 && engagement >= 0 && engagement <= 100;
 
-  const handlePredict = useCallback(() => {
+  const handlePredict = useCallback(async () => {
     setLoading(true);
+    setError(null);
     const input = { attendance, testScore, assignmentScore, backlogs: parseInt(backlogs), engagement };
-    // Simulate API delay
-    setTimeout(() => {
-      const res = mockPredict(input);
+    
+    try {
+      const res = await predictStudent(input);
       setResult(res);
       setHistory((prev) => [{ id: Date.now(), input, result: res }, ...prev].slice(0, 10));
+    } catch (err) {
+      let errorMessage: string;
+      if (err instanceof ApiError) {
+        errorMessage = err.message;
+      } else if (err instanceof Error) {
+        errorMessage = err.message;
+      } else if (typeof err === "string") {
+        errorMessage = err;
+      } else {
+        errorMessage = "Failed to get prediction. Please try again.";
+      }
+      setError(errorMessage);
+      toast({
+        title: "Prediction Error",
+        description: errorMessage,
+        variant: "destructive",
+      });
+    } finally {
       setLoading(false);
-    }, 1200);
+    }
   }, [attendance, testScore, assignmentScore, backlogs, engagement]);
 
   const handleReset = () => {
@@ -127,6 +151,16 @@ export default function Prediction() {
         {/* Results Panel */}
         <div className="space-y-6">
           <AnimatePresence mode="wait">
+            {error && (
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.4 }}>
+                <Card className="border-destructive/50 bg-destructive/10">
+                  <CardContent className="flex items-center gap-3 pt-6">
+                    <AlertCircle className="h-5 w-5 text-destructive" />
+                    <p className="text-sm text-destructive">{error}</p>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            )}
             {result && (
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.4 }}>
                 <Card>
@@ -164,6 +198,64 @@ export default function Prediction() {
                         ))}
                       </div>
                     </div>
+
+                    {/* Feature Importance Chart */}
+                    {result.feature_importance && result.feature_importance.length > 0 && (
+                      <div>
+                        <p className="text-sm font-medium mb-3">Feature Impact on Prediction</p>
+                        <div className="h-48">
+                          <ResponsiveContainer width="100%" height="100%">
+                            <BarChart
+                              data={[...result.feature_importance]
+                                .sort((a, b) => Math.abs(b.importance) - Math.abs(a.importance))
+                                .map(fi => ({
+                                  ...fi,
+                                  importancePercent: Math.round(fi.importance * 100)
+                                }))}
+                              layout="vertical"
+                              margin={{ top: 5, right: 30, left: 80, bottom: 5 }}
+                            >
+                              <CartesianGrid strokeDasharray="3 3" stroke="hsl(214, 32%, 91%)" horizontal={false} />
+                              <XAxis type="number" domain={[0, 100]} tickFormatter={(v) => `${v}%`} tick={{ fontSize: 11 }} />
+                              <YAxis 
+                                dataKey="feature" 
+                                type="category" 
+                                width={75}
+                                tick={{ fontSize: 12 }}
+                              />
+                              <Tooltip 
+                                formatter={(value: number) => [`${value}%`, "Influence"]} 
+                                contentStyle={{ fontSize: 12 }}
+                              />
+                              <Bar dataKey="importancePercent" radius={[0, 4, 4, 0]}>
+                                {result.feature_importance.map((entry, index) => {
+                                  // Determine color based on feature and threshold
+                                  let fill = "hsl(214, 32%, 91%)"; // default grey
+                                  const factor = result.factors.find(f => {
+                                    const nameMap: Record<string, string> = {
+                                      "Attendance": "Attendance",
+                                      "Test Score": "Test Score", 
+                                      "Assignments": "Assignment Score",
+                                      "Backlogs": "Backlogs",
+                                      "Engagement": "Engagement"
+                                    };
+                                    return nameMap[f.name] === entry.feature;
+                                  });
+                                  
+                                  if (factor) {
+                                    if (factor.impact === "positive") fill = "hsl(160, 84%, 39%)"; // green
+                                    else if (factor.impact === "negative") fill = "hsl(0, 84%, 60%)"; // red
+                                    else fill = "hsl(214, 32%, 91%)"; // grey
+                                  }
+                                  
+                                  return <Cell key={`cell-${index}`} fill={fill} />;
+                                })}
+                              </Bar>
+                            </BarChart>
+                          </ResponsiveContainer>
+                        </div>
+                      </div>
+                    )}
 
                     {/* Recommendations */}
                     <div>

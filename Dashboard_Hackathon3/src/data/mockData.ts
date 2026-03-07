@@ -1,7 +1,6 @@
 // Mock data for the Student Performance Prediction Dashboard
 
 export interface Student {
-  id: number;
   attendance: number;
   testScore: number;
   assignmentScore: number;
@@ -11,36 +10,36 @@ export interface Student {
 }
 
 export const students: Student[] = [
-  { id: 1, attendance: 92, testScore: 88, assignmentScore: 91, backlogs: 0, engagement: 85, performance: "High" },
-  { id: 2, attendance: 78, testScore: 72, assignmentScore: 68, backlogs: 1, engagement: 65, performance: "Medium" },
-  { id: 3, attendance: 55, testScore: 45, assignmentScore: 50, backlogs: 3, engagement: 40, performance: "Low" },
-  { id: 4, attendance: 88, testScore: 82, assignmentScore: 85, backlogs: 0, engagement: 80, performance: "High" },
-  { id: 5, attendance: 65, testScore: 58, assignmentScore: 62, backlogs: 2, engagement: 55, performance: "Low" },
-  { id: 6, attendance: 95, testScore: 90, assignmentScore: 93, backlogs: 0, engagement: 92, performance: "High" },
-  { id: 7, attendance: 70, testScore: 65, assignmentScore: 70, backlogs: 1, engagement: 60, performance: "Medium" },
-  { id: 8, attendance: 82, testScore: 75, assignmentScore: 78, backlogs: 0, engagement: 72, performance: "Medium" },
-  { id: 9, attendance: 48, testScore: 40, assignmentScore: 42, backlogs: 4, engagement: 35, performance: "Low" },
-  { id: 10, attendance: 91, testScore: 86, assignmentScore: 89, backlogs: 0, engagement: 88, performance: "High" },
-  { id: 11, attendance: 73, testScore: 68, assignmentScore: 65, backlogs: 1, engagement: 62, performance: "Medium" },
-  { id: 12, attendance: 60, testScore: 52, assignmentScore: 55, backlogs: 2, engagement: 48, performance: "Low" },
-  { id: 13, attendance: 87, testScore: 80, assignmentScore: 83, backlogs: 0, engagement: 78, performance: "High" },
-  { id: 14, attendance: 76, testScore: 70, assignmentScore: 72, backlogs: 1, engagement: 66, performance: "Medium" },
-  { id: 15, attendance: 52, testScore: 43, assignmentScore: 47, backlogs: 3, engagement: 38, performance: "Low" },
-  { id: 16, attendance: 94, testScore: 91, assignmentScore: 90, backlogs: 0, engagement: 90, performance: "High" },
-  { id: 17, attendance: 68, testScore: 60, assignmentScore: 63, backlogs: 2, engagement: 57, performance: "Medium" },
-  { id: 18, attendance: 85, testScore: 79, assignmentScore: 81, backlogs: 0, engagement: 75, performance: "High" },
-  { id: 19, attendance: 58, testScore: 48, assignmentScore: 51, backlogs: 3, engagement: 42, performance: "Low" },
-  { id: 20, attendance: 80, testScore: 74, assignmentScore: 76, backlogs: 1, engagement: 70, performance: "Medium" },
-  { id: 21, attendance: 90, testScore: 85, assignmentScore: 87, backlogs: 0, engagement: 83, performance: "High" },
-  { id: 22, attendance: 62, testScore: 54, assignmentScore: 58, backlogs: 2, engagement: 50, performance: "Low" },
-  { id: 23, attendance: 75, testScore: 69, assignmentScore: 71, backlogs: 1, engagement: 64, performance: "Medium" },
-  { id: 24, attendance: 50, testScore: 38, assignmentScore: 44, backlogs: 4, engagement: 33, performance: "Low" },
-  { id: 25, attendance: 89, testScore: 84, assignmentScore: 86, backlogs: 0, engagement: 82, performance: "High" },
-  { id: 26, attendance: 77, testScore: 71, assignmentScore: 73, backlogs: 1, engagement: 67, performance: "Medium" },
-  { id: 27, attendance: 96, testScore: 93, assignmentScore: 95, backlogs: 0, engagement: 94, performance: "High" },
-  { id: 28, attendance: 63, testScore: 55, assignmentScore: 57, backlogs: 2, engagement: 49, performance: "Low" },
-  { id: 29, attendance: 83, testScore: 77, assignmentScore: 79, backlogs: 0, engagement: 74, performance: "Medium" },
-  { id: 30, attendance: 45, testScore: 35, assignmentScore: 40, backlogs: 5, engagement: 30, performance: "Low" },
+  { attendance: 92, testScore: 88, assignmentScore: 91, backlogs: 0, engagement: 85, performance: "High" },
+  { attendance: 78, testScore: 72, assignmentScore: 68, backlogs: 1, engagement: 65, performance: "Medium" },
+  { attendance: 55, testScore: 45, assignmentScore: 50, backlogs: 3, engagement: 40, performance: "Low" },
+  { attendance: 88, testScore: 82, assignmentScore: 85, backlogs: 0, engagement: 80, performance: "High" },
+  { attendance: 65, testScore: 58, assignmentScore: 62, backlogs: 2, engagement: 55, performance: "Low" },
+  { attendance: 95, testScore: 90, assignmentScore: 93, backlogs: 0, engagement: 92, performance: "High" },
+  { attendance: 70, testScore: 65, assignmentScore: 70, backlogs: 1, engagement: 60, performance: "Medium" },
+  { attendance: 82, testScore: 75, assignmentScore: 78, backlogs: 0, engagement: 72, performance: "Medium" },
+  { attendance: 48, testScore: 40, assignmentScore: 42, backlogs: 4, engagement: 35, performance: "Low" },
+  { attendance: 91, testScore: 86, assignmentScore: 89, backlogs: 0, engagement: 88, performance: "High" },
+  { attendance: 73, testScore: 68, assignmentScore: 65, backlogs: 1, engagement: 62, performance: "Medium" },
+  { attendance: 60, testScore: 52, assignmentScore: 55, backlogs: 2, engagement: 48, performance: "Low" },
+  { attendance: 87, testScore: 80, assignmentScore: 83, backlogs: 0, engagement: 78, performance: "High" },
+  { attendance: 76, testScore: 70, assignmentScore: 72, backlogs: 1, engagement: 66, performance: "Medium" },
+  { attendance: 52, testScore: 43, assignmentScore: 47, backlogs: 3, engagement: 38, performance: "Low" },
+  { attendance: 94, testScore: 91, assignmentScore: 90, backlogs: 0, engagement: 90, performance: "High" },
+  { attendance: 68, testScore: 60, assignmentScore: 63, backlogs: 2, engagement: 57, performance: "Medium" },
+  { attendance: 85, testScore: 79, assignmentScore: 81, backlogs: 0, engagement: 75, performance: "High" },
+  { attendance: 58, testScore: 48, assignmentScore: 51, backlogs: 3, engagement: 42, performance: "Low" },
+  { attendance: 80, testScore: 74, assignmentScore: 76, backlogs: 1, engagement: 70, performance: "Medium" },
+  { attendance: 90, testScore: 85, assignmentScore: 87, backlogs: 0, engagement: 83, performance: "High" },
+  { attendance: 62, testScore: 54, assignmentScore: 58, backlogs: 2, engagement: 50, performance: "Low" },
+  { attendance: 75, testScore: 69, assignmentScore: 71, backlogs: 1, engagement: 64, performance: "Medium" },
+  { attendance: 50, testScore: 38, assignmentScore: 44, backlogs: 4, engagement: 33, performance: "Low" },
+  { attendance: 89, testScore: 84, assignmentScore: 86, backlogs: 0, engagement: 82, performance: "High" },
+  { attendance: 77, testScore: 71, assignmentScore: 73, backlogs: 1, engagement: 67, performance: "Medium" },
+  { attendance: 96, testScore: 93, assignmentScore: 95, backlogs: 0, engagement: 94, performance: "High" },
+  { attendance: 63, testScore: 55, assignmentScore: 57, backlogs: 2, engagement: 49, performance: "Low" },
+  { attendance: 83, testScore: 77, assignmentScore: 79, backlogs: 0, engagement: 74, performance: "Medium" },
+  { attendance: 45, testScore: 35, assignmentScore: 40, backlogs: 5, engagement: 30, performance: "Low" },
 ];
 
 export const overviewStats = {

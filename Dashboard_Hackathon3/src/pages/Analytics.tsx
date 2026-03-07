@@ -1,11 +1,12 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import PerformanceBadge from "@/components/PerformanceBadge";
-import { students, featureImportance, type Student } from "@/data/mockData";
-import { Download, RotateCcw, ChevronLeft, ChevronRight } from "lucide-react";
+import { getStudents, getModelInfo, ApiError, type ModelInfoResponse } from "@/services/api";
+import type { Student } from "@/data/mockData";
+import { Download, RotateCcw, ChevronLeft, ChevronRight, Loader2, AlertTriangle } from "lucide-react";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   ScatterChart, Scatter, Cell,
@@ -15,11 +16,41 @@ const ROWS_PER_PAGE = 10;
 const perfColors: Record<string, string> = { High: "hsl(160,84%,39%)", Medium: "hsl(38,92%,50%)", Low: "hsl(0,84%,60%)" };
 
 export default function Analytics() {
+  const [students, setStudents] = useState<Student[]>([]);
+  const [modelInfo, setModelInfo] = useState<ModelInfoResponse | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [perfFilter, setPerfFilter] = useState<string>("all");
   const [attendanceFilter, setAttendanceFilter] = useState<string>("all");
-  const [sortCol, setSortCol] = useState<keyof Student>("id");
+  const [sortCol, setSortCol] = useState<string>("attendance");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
   const [page, setPage] = useState(0);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        setLoading(true);
+        const [studentsData, modelData] = await Promise.all([
+          getStudents(),
+          getModelInfo(),
+        ]);
+        setStudents(studentsData);
+        setModelInfo(modelData);
+      } catch (err) {
+        let errorMessage = "Failed to load analytics data";
+        if (err instanceof ApiError) {
+          errorMessage = err.message;
+        } else if (err instanceof Error) {
+          errorMessage = err.message;
+        }
+        setError(errorMessage);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchData();
+  }, []);
 
   const filtered = useMemo(() => {
     let data = [...students];
@@ -28,18 +59,18 @@ export default function Analytics() {
     else if (attendanceFilter === "mid") data = data.filter((s) => s.attendance >= 60 && s.attendance < 80);
     else if (attendanceFilter === "high") data = data.filter((s) => s.attendance >= 80);
     data.sort((a, b) => {
-      const av = a[sortCol], bv = b[sortCol];
+      const av = a[sortCol as keyof Student], bv = b[sortCol as keyof Student];
       if (av < bv) return sortDir === "asc" ? -1 : 1;
       if (av > bv) return sortDir === "asc" ? 1 : -1;
       return 0;
     });
     return data;
-  }, [perfFilter, attendanceFilter, sortCol, sortDir]);
+  }, [students, perfFilter, attendanceFilter, sortCol, sortDir]);
 
   const totalPages = Math.ceil(filtered.length / ROWS_PER_PAGE);
   const paged = filtered.slice(page * ROWS_PER_PAGE, (page + 1) * ROWS_PER_PAGE);
 
-  const handleSort = (col: keyof Student) => {
+  const handleSort = (col: string) => {
     if (sortCol === col) setSortDir((d) => (d === "asc" ? "desc" : "asc"));
     else { setSortCol(col); setSortDir("asc"); }
   };
@@ -47,17 +78,55 @@ export default function Analytics() {
   const resetFilters = () => { setPerfFilter("all"); setAttendanceFilter("all"); setPage(0); };
 
   const exportCsv = () => {
-    const header = "ID,Attendance,Test Score,Assignment Score,Backlogs,Engagement,Performance\n";
-    const rows = filtered.map((s) => `${s.id},${s.attendance},${s.testScore},${s.assignmentScore},${s.backlogs},${s.engagement},${s.performance}`).join("\n");
+    const header = "Attendance,Test Score,Assignment Score,Backlogs,Engagement,Performance\n";
+    const rows = filtered.map((s) => `${s.attendance},${s.testScore},${s.assignmentScore},${s.backlogs},${s.engagement},${s.performance}`).join("\n");
     const blob = new Blob([header + rows], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a"); a.href = url; a.download = "student_data.csv"; a.click();
     URL.revokeObjectURL(url);
   };
 
-  const SortIndicator = ({ col }: { col: keyof Student }) => (
+  const SortIndicator = ({ col }: { col: string }) => (
     <span className="ml-1 text-xs text-muted-foreground">{sortCol === col ? (sortDir === "asc" ? "↑" : "↓") : ""}</span>
   );
+
+  // Transform feature importance for chart
+  const featureImportanceData = useMemo(() => {
+    if (!modelInfo) return [];
+    const featureLabels: Record<string, string> = {
+      attendance: "Attendance %",
+      internal_score: "Internal Test Score",
+      assignment_score: "Assignment Score",
+      engagement: "Engagement Score",
+      backlogs: "Number of Backlogs",
+    };
+    return Object.entries(modelInfo.feature_importance).map(([key, value]) => ({
+      feature: featureLabels[key] || key,
+      importance: value,
+    }));
+  }, [modelInfo]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <span className="ml-2 text-muted-foreground">Loading analytics data...</span>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <AlertTriangle className="h-8 w-8 text-destructive mx-auto mb-2" />
+          <p className="text-destructive">{error}</p>
+        </div>
+      </div>
+    );
+  }
+
+  const columns = ["attendance", "testScore", "assignmentScore", "backlogs", "engagement", "performance"];
 
   return (
     <div className="space-y-8">
@@ -101,9 +170,9 @@ export default function Analytics() {
           <CardHeader><CardTitle className="text-base">Feature Importance</CardTitle></CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={280}>
-              <BarChart data={featureImportance} layout="vertical">
+              <BarChart data={featureImportanceData} layout="vertical">
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(214, 32%, 91%)" />
-                <XAxis type="number" domain={[0, 0.35]} tick={{ fontSize: 12 }} />
+                <XAxis type="number" domain={[0, 0.5]} tick={{ fontSize: 12 }} />
                 <YAxis dataKey="feature" type="category" width={130} tick={{ fontSize: 12 }} />
                 <Tooltip formatter={(v: number) => `${(v * 100).toFixed(0)}%`} />
                 <Bar dataKey="importance" fill="hsl(217, 91%, 60%)" radius={[0, 4, 4, 0]} />
@@ -141,18 +210,17 @@ export default function Analytics() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  {(["id", "attendance", "testScore", "assignmentScore", "backlogs", "engagement", "performance"] as (keyof Student)[]).map((col) => (
+                  {columns.map((col) => (
                     <TableHead key={col} className="cursor-pointer select-none whitespace-nowrap" onClick={() => handleSort(col)}>
-                      {col === "id" ? "ID" : col === "testScore" ? "Test Score" : col === "assignmentScore" ? "Assignment" : col.charAt(0).toUpperCase() + col.slice(1)}
+                      {col === "testScore" ? "Test Score" : col === "assignmentScore" ? "Assignment" : col.charAt(0).toUpperCase() + col.slice(1)}
                       <SortIndicator col={col} />
                     </TableHead>
                   ))}
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {paged.map((s) => (
-                  <TableRow key={s.id}>
-                    <TableCell className="font-medium">{s.id}</TableCell>
+                {paged.map((s, i) => (
+                  <TableRow key={i}>
                     <TableCell>{s.attendance}%</TableCell>
                     <TableCell>{s.testScore}</TableCell>
                     <TableCell>{s.assignmentScore}</TableCell>
